@@ -3,9 +3,9 @@
 **item_proto_lib** is a free open-source library used to edit _Metin2_'s client item database.
 It should be safe to use, yet it is recommended to have a backup of your files before using it, just in case.
 
-This library provides only the basic functionality for editing. It does not include any visual interface. I will provide a free visual interface, including precompiled library.
+This library provides only the basic functionality for editing. It does not include any graphic interface. I will provide a free graphic interface, including precompiled library.
 
-You can download the free interface from [MEGA](https://mega.nz/#!uc4SmKIC!rAODgCsd_OzzJyAjgK3xiCW_LGxAQrElQgw4Lu2-x98). I can also provide you with visual interface source code, if requested.
+You can download the free interface from [MEGA](https://mega.nz/#!uc4SmKIC!rAODgCsd_OzzJyAjgK3xiCW_LGxAQrElQgw4Lu2-x98). I can also provide you with graphic interface source code, if requested.
 
 ### Editing
 #### What you need
