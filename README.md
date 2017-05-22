@@ -1,37 +1,26 @@
-## Welcome to GitHub Pages
+## item_proto_lib
 
-You can use the [editor on GitHub](https://github.com/Cataclismo/item_proto_lib/edit/master/README.md) to maintain and preview the content for your website in Markdown files.
+**item_proto_lib** is a free open-source library used to edit _Metin2_'s client item database.
+It should be safe to use, yet it is recommended to have a backup of your files before using it, just in case.
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+This library provides only the basic functionality for editing. It does not include any visual interface. I will provide a free visual interface, including precompiled library.
 
-### Markdown
+You can download the free interface from [MEGA](https://mega.nz/#!uc4SmKIC!rAODgCsd_OzzJyAjgK3xiCW_LGxAQrElQgw4Lu2-x98). I can also provide you with visual interface source code, if requested.
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+### Editing
+#### What you need
+- Microsoft Visual Studio 2015
+- C++/CLI extension for VS
 
-```markdown
-Syntax highlighted code block
+#### How to
+Just clone or download the repository and open _item_proto_lib.sln_. You should be able to edit any file you want. It contains some documention in code, but the code itself should be understandable.
 
-# Header 1
-## Header 2
-### Header 3
+## Building
+Since the library has no external dependencies, you can build it immediately after download using the above stated dependencies.
 
-- Bulleted
-- List
+## Usage
+The library is CLI so it should be used in any visual programming language, like: _C#_ or _Visual Basic_. Just create a new _Windows Forms_ or _WPF_ application, open _Solution Explorer_, right click on _References_ and add the library.
+Keep in  mind that everything is inside **item_proto_lib** namespace.
 
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
-
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/Cataclismo/item_proto_lib/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+## Contribution
+Anyone can contribute to the project, but you **must** follow my coding style. 
