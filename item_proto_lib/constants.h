@@ -1,7 +1,7 @@
 #ifndef _CONSTANTS_H_
 #define _CONSTANTS_H_
 
-namespace cnst
+namespace item_proto_lib
 {
     const int32_t ITEM_NAME_MAX_LEN     = 24;
     const int32_t ITEM_LIMIT_MAX_NUM    = 2;

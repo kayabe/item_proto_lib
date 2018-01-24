@@ -3,70 +3,67 @@
 
 namespace item_proto_lib
 {
-    namespace buffer
+    public ref class CBuffer
     {
-        public ref class CBuffer
+    public:
+        CBuffer(uint32_t size) : m_size(size), m_dataSize(0)
         {
-        public:
-            CBuffer(uint32_t size) : m_size(size), m_dataSize(0)
+            m_buffer = new char[size];
+            memset(m_buffer, 0, size);
+        }
+
+        ~CBuffer()
+        {
+            delete[] m_buffer;
+        }
+
+        template <typename TYPE>
+        bool Write(const TYPE& data)
+        {
+            bool bRet = false;
+
+            if (m_dataSize + sizeof(TYPE) <= m_size)
             {
-                m_buffer = new char[size];
-                memset(m_buffer, 0, size);
+                bRet = true;
+
+                memcpy(m_buffer + m_dataSize, &data, sizeof(TYPE));
+                m_dataSize += sizeof(TYPE);
             }
 
-            ~CBuffer()
-            {
-                delete[] m_buffer;
-            }
+            return bRet;
+        }
 
-            template <typename TYPE>
-            bool Write(const TYPE& data)
-            {
-                bool bRet = false;
+        /* Can't pass by (const) reference managed class member variables */
+        bool Write(uint32_t data)
+        {
+            return Write(static_cast<int32_t>(data));
+        }
 
-                if (m_dataSize + sizeof(TYPE) <= m_size)
-                {
-                    bRet = true;
+        char* GetPtr()
+        {
+            return m_buffer;
+        }
 
-                    memcpy(m_buffer + m_dataSize, &data, sizeof(TYPE));
-                    m_dataSize += sizeof(TYPE);
-                }
+        char* GetWritePtr()
+        {
+            return m_buffer + m_dataSize;
+        }
 
-                return bRet;
-            }
+        uint32_t GetBufferSize()
+        {
+            return m_size;
+        }
 
-            /* Can't pass by (const) reference managed class member variables */
-            bool Write(uint32_t data)
-            {
-                return Write(static_cast<int32_t>(data));
-            }
+        uint32_t GetDataSize()
+        {
+            return m_dataSize;
+        }
 
-            char* GetPtr()
-            {
-                return m_buffer;
-            }
-
-            char* GetWritePtr()
-            {
-                return m_buffer + m_dataSize;
-            }
-
-            uint32_t GetBufferSize()
-            {
-                return m_size;
-            }
-
-            uint32_t GetDataSize()
-            {
-                return m_dataSize;
-            }
-
-        private:
-            char * m_buffer;
-            uint32_t m_size;
-            uint32_t m_dataSize;
-        };
-    }
+    private:
+        char * m_buffer;
+        uint32_t m_size;
+        uint32_t m_dataSize;
+    };
 }
 
 #endif

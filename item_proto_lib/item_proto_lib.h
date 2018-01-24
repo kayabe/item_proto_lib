@@ -31,16 +31,16 @@ namespace item_proto_lib
         TError WriteProto(System::String^ name);
 
         /* Returns the item at a specified index. */
-        item::CItem^ GetItem(int32_t index);
+        CItem^ GetItem(int32_t index);
         /* Returns the current number of items. */
         int32_t GetCount();
 
         /* Deletes item at a specified index. */
         void DeleteItem(int32_t index);
         /* Adds item after it's VNUM neighbour and returns its position. Returns -1 if VNUM already exists. */
-        int32_t AddItem(item::CItem^ item);
+        int32_t AddItem(CItem^ item);
         /* Adds item at the end of the list. This method is slightly faster since there's no search. */
-        void AddBack(item::CItem^ item);
+        void AddBack(CItem^ item);
 
         /* Sort items by vnum - they are NOT sorted by default. */
         void SortItems();
@@ -61,7 +61,7 @@ namespace item_proto_lib
         TError Write(std::ofstream& file);
 
     private:
-        cliext::vector<item::CItem^>^ m_itemVector;
+        cliext::vector<CItem^>^ m_itemVector;
         uint32_t m_version;
         uint32_t m_fourCC;
         uint32_t m_headerFourCC;

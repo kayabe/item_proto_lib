@@ -8,11 +8,11 @@ namespace item_proto_lib
 {
     CItemProtoManager::CItemProtoManager()
     {
-        m_itemVector        = gcnew vector<item::CItem^>();
+        m_itemVector        = gcnew vector<CItem^>();
         m_version           = 1;
-        m_fourCC            = utils::GetFourCC('M', 'I', 'P', 'X');
-        m_headerFourCC      = utils::GetFourCC('M', 'C', 'O', 'Z');
-        m_encryptedFourCC   = utils::GetFourCC('M', 'C', 'O', 'Z');
+        m_fourCC            = GetFourCC('M', 'I', 'P', 'X');
+        m_headerFourCC      = GetFourCC('M', 'C', 'O', 'Z');
+        m_encryptedFourCC   = GetFourCC('M', 'C', 'O', 'Z');
 
         lzo_init();
     }
@@ -25,7 +25,7 @@ namespace item_proto_lib
     {
         TError ret = TError::ERR_OK;
 
-        array<char>^ arrName = Array::ConvertAll(name->ToCharArray(), utils::GetConverter<wchar_t, char>());
+        array<char>^ arrName = Array::ConvertAll(name->ToCharArray(), GetConverter<wchar_t, char>());
         pin_ptr<char> pname = &arrName[0];
 
         std::ifstream file(pname, std::ios::binary);
@@ -47,7 +47,7 @@ namespace item_proto_lib
     {
         TError ret = TError::ERR_OK;
 
-        array<char>^ arrName = Array::ConvertAll(name->ToCharArray(), utils::GetConverter<wchar_t, char>());
+        array<char>^ arrName = Array::ConvertAll(name->ToCharArray(), GetConverter<wchar_t, char>());
         pin_ptr<char> pname = &arrName[0];
 
         std::ofstream file(pname, std::ios::binary);
@@ -82,41 +82,41 @@ namespace item_proto_lib
         * >> DATA
         */
 
-        table::TPreHeader preHeader;
+        TPreHeader preHeader;
         preHeader.dwFourCC = m_fourCC;
         preHeader.dwVersion = m_version;
-        preHeader.dwStride = sizeof(table::TItemTable);
+        preHeader.dwStride = sizeof(TItemTable);
         preHeader.dwCount = m_itemVector->size();
-        preHeader.dwDataSize = m_itemVector->size() * sizeof(table::TItemTable);
+        preHeader.dwDataSize = m_itemVector->size() * sizeof(TItemTable);
 
-        table::TProtoHeader header;
+        TProtoHeader header;
         header.dwFourCC = m_headerFourCC;
-        header.dwRealSize = m_itemVector->size() * sizeof(table::TItemTable);
+        header.dwRealSize = m_itemVector->size() * sizeof(TItemTable);
         header.dwCompressedSize = 0;
         header.dwEncryptSize = 0;
 
-        buffer::CBuffer^ itemsBuffer = gcnew buffer::CBuffer(header.dwRealSize);
+        CBuffer^ itemsBuffer = gcnew CBuffer(header.dwRealSize);
         for (int32_t i = 0; i < m_itemVector->size(); ++i)
         {
-            itemsBuffer->Write(utils::ItemToTable(m_itemVector[i]));
+            itemsBuffer->Write(ItemToTable(m_itemVector[i]));
         }
 
         uint32_t dataSize = sizeof(uint32_t) + (header.dwRealSize + (header.dwRealSize / 64) + 16 + 3) + 8;
-        buffer::CBuffer^ compressedBuffer = gcnew buffer::CBuffer(dataSize);
+        CBuffer^ compressedBuffer = gcnew CBuffer(dataSize);
         compressedBuffer->Write(m_encryptedFourCC);
 
-        buffer::CBuffer^ workMemBuffer = gcnew buffer::CBuffer(LZO1X_1_MEM_COMPRESS);
+        CBuffer^ workMemBuffer = gcnew CBuffer(LZO1X_1_MEM_COMPRESS);
         lzo_uint compressedSize = 0;
         int lzoRet = lzo1x_1_compress((const unsigned char *)itemsBuffer->GetPtr(), itemsBuffer->GetDataSize(), (unsigned char*)compressedBuffer->GetWritePtr(), &compressedSize, (void *)workMemBuffer->GetPtr());
         if (LZO_E_OK == lzoRet)
         {
-            buffer::CBuffer^ encryptedBuffer = gcnew buffer::CBuffer(dataSize);
+            CBuffer^ encryptedBuffer = gcnew CBuffer(dataSize);
 
             header.dwCompressedSize = compressedSize;
             header.dwEncryptSize = xtea::CXTea::Encrypt((const uint32_t *)compressedBuffer->GetPtr(), (uint32_t *)encryptedBuffer->GetPtr(), compressedSize + 19);
 
             file.write((const char*)&preHeader, sizeof(preHeader));
-            file.write((const char*)&header, sizeof(table::TProtoHeader));
+            file.write((const char*)&header, sizeof(TProtoHeader));
             file.write(encryptedBuffer->GetPtr(), header.dwEncryptSize);
         }
         else
@@ -131,12 +131,12 @@ namespace item_proto_lib
     {
         TError ret = TError::ERR_OK;
 
-        table::TPreHeader preHeader;
-        utils::ReadData(file, preHeader);
+        TPreHeader preHeader;
+        ReadData(file, preHeader);
 
         if (preHeader.dwFourCC == m_fourCC)
         {
-            if ((preHeader.dwVersion == m_version) && (preHeader.dwStride == sizeof(table::TItemTable)))
+            if ((preHeader.dwVersion == m_version) && (preHeader.dwStride == sizeof(TItemTable)))
             {
                 ret = ReadItems(file, preHeader.dwCount, preHeader.dwDataSize);
             }
@@ -157,8 +157,8 @@ namespace item_proto_lib
     {
         TError ret = TError::ERR_OK;
 
-        table::TProtoHeader header;
-        utils::ReadData(file, header);
+        TProtoHeader header;
+        ReadData(file, header);
 
         if (header.dwFourCC != m_headerFourCC)
         {
@@ -166,10 +166,10 @@ namespace item_proto_lib
         }
         else
         {
-            buffer::CBuffer^ srcBuffer = gcnew buffer::CBuffer(header.dwEncryptSize);
+            CBuffer^ srcBuffer = gcnew CBuffer(header.dwEncryptSize);
             file.read(srcBuffer->GetPtr(), header.dwEncryptSize);
 
-            buffer::CBuffer^ compBuffer = gcnew buffer::CBuffer(header.dwEncryptSize);
+            CBuffer^ compBuffer = gcnew CBuffer(header.dwEncryptSize);
             xtea::CXTea::Decrypt((const uint32_t *)srcBuffer->GetPtr(), (uint32_t *)compBuffer->GetPtr(), header.dwEncryptSize);
 
             if ((*(uint32_t *)compBuffer->GetPtr()) != m_encryptedFourCC)
@@ -178,7 +178,7 @@ namespace item_proto_lib
             }
             else
             {
-                buffer::CBuffer^ data = gcnew buffer::CBuffer(header.dwRealSize);
+                CBuffer^ data = gcnew CBuffer(header.dwRealSize);
                 lzo_uint uiSize = 0;
 
                 lzo1x_decompress((const unsigned char *)(compBuffer->GetPtr() + sizeof(uint32_t)), header.dwCompressedSize, (unsigned char *)data->GetPtr(), &uiSize, nullptr);
@@ -189,11 +189,11 @@ namespace item_proto_lib
                 }
                 else
                 {
-                    table::TItemTable * table = (table::TItemTable *)data->GetPtr();
+                    TItemTable * table = reinterpret_cast<TItemTable *>(data->GetPtr());
 
                     for (uint32_t i = 0; i < count; ++i)
                     {
-                        m_itemVector->push_back(gcnew item::CItem(table[i]));
+                        m_itemVector->push_back(gcnew CItem(table[i]));
                     }
                 }
             }
@@ -202,9 +202,9 @@ namespace item_proto_lib
         return ret;
     }
 
-    item::CItem^ CItemProtoManager::GetItem(int32_t index)
+    CItem^ CItemProtoManager::GetItem(int32_t index)
     {
-        item::CItem ^ ret = nullptr;
+        CItem ^ ret = nullptr;
 
         if (index >= m_itemVector->size())
         {
@@ -231,7 +231,7 @@ namespace item_proto_lib
         }
     }
 
-    int32_t CItemProtoManager::AddItem(item::CItem^ item)
+    int32_t CItemProtoManager::AddItem(CItem^ item)
     {
         int32_t ret = -1;
 
@@ -249,7 +249,7 @@ namespace item_proto_lib
         return ret;
     }
 
-    void CItemProtoManager::AddBack(item::CItem^ item)
+    void CItemProtoManager::AddBack(CItem^ item)
     {
         if (item != nullptr)
         {
@@ -259,7 +259,7 @@ namespace item_proto_lib
 
     void CItemProtoManager::SortItems()
     {
-        cliext::sort(m_itemVector->begin(), m_itemVector->end(), utils::SortPredicate);
+        cliext::sort(m_itemVector->begin(), m_itemVector->end(),  SortPredicate);
     }
 
     void CItemProtoManager::SetVersion(uint32_t version)
@@ -269,16 +269,16 @@ namespace item_proto_lib
 
     void CItemProtoManager::SetFourCC(uint8_t A, uint8_t B, uint8_t C, uint8_t D)
     {
-        m_fourCC = utils::GetFourCC(A, B, C, D);
+        m_fourCC =  GetFourCC(A, B, C, D);
     }
 
     void CItemProtoManager::SetHeaderFourCC(uint8_t A, uint8_t B, uint8_t C, uint8_t D)
     {
-        m_headerFourCC = utils::GetFourCC(A, B, C, D);
+        m_headerFourCC =  GetFourCC(A, B, C, D);
     }
 
     void CItemProtoManager::SetEncryptedFourCC(uint8_t A, uint8_t B, uint8_t C, uint8_t D)
     {
-        m_encryptedFourCC = utils::GetFourCC(A, B, C, D);
+        m_encryptedFourCC =  GetFourCC(A, B, C, D);
     }
 }

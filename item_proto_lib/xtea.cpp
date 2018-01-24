@@ -57,7 +57,7 @@ namespace item_proto_lib
             for (i = 0; i < resize >> 3; i++, dst += 2, src += 2)
             {
                 uint32_t test = resize >> 3;
-                Decode(*(src + 1), *src, cnst::ITEMPROTO_KEY, dst);
+                Decode(*(src + 1), *src, ITEMPROTO_KEY, dst);
             }
         }
 
@@ -78,7 +78,7 @@ namespace item_proto_lib
 
             for (i = 0; i < resize >> 3; i++, dst += 2, src += 2)
             {
-                Encode(*(src + 1), *src, cnst::ITEMPROTO_KEY, dst);
+                Encode(*(src + 1), *src, ITEMPROTO_KEY, dst);
             }
 
             return resize;
